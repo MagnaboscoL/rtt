@@ -79,6 +79,7 @@ namespace RTT
 	{
         pthread_attr_destroy( &(main_task->attr) );
         free(main_task->name);
+        main_task->name = NULL;
 	    return 0;
 	}
 
@@ -277,7 +278,8 @@ namespace RTT
 	INTERNAL_QUAL void rtos_task_delete(RTOS_TASK* mytask) {
         pthread_join( mytask->thread, 0);
         pthread_attr_destroy( &(mytask->attr) );
-	    free(mytask->name);
+        free(mytask->name);
+        mytask->name = NULL;
 	}
 
     INTERNAL_QUAL int rtos_task_check_scheduler(int* scheduler)

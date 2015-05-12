@@ -50,6 +50,7 @@ namespace RTT
 	INTERNAL_QUAL int rtos_task_delete_main(RTOS_TASK* main_task)
 	{
         free(main_task->name);
+        main_task->name = NULL;
 	    return 0;
 	}
 
@@ -177,6 +178,8 @@ namespace RTT
     INTERNAL_QUAL void rtos_task_delete(RTOS_TASK* mytask) {
       // Free name
       free(mytask->name);
+      mytask->name = NULL;
+
       // KG: Peter does not check return values, it appears...
       bool succeed = cyg_thread_delete(mytask->handle);
       if (succeed == false)
