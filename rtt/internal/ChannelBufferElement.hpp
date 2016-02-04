@@ -72,7 +72,7 @@ namespace RTT { namespace internal {
          *
          * @return true if there was room in the FIFO for the new sample, and false otherwise.
          */
-        virtual WriteStatus write(param_t sample)
+        virtual WriteStatus write(param_t sample) RTT_OVERRIDE
         {
             if (!buffer->Push(sample)) return WriteFailure;
             return this->signal() ? WriteSuccess : NotConnected;
@@ -82,7 +82,7 @@ namespace RTT { namespace internal {
          *
          * @return false if the FIFO was empty, and true otherwise
          */
-        virtual FlowStatus read(reference_t sample, bool copy_old_data)
+        virtual FlowStatus read(reference_t sample, bool copy_old_data) RTT_OVERRIDE
         {
             value_t *new_sample_p;
             if ( (new_sample_p = buffer->PopWithoutRelease()) ) {
@@ -113,7 +113,7 @@ namespace RTT { namespace internal {
          * will always return false (provided write() has not been called in the
          * meantime).
          */
-        virtual void clear()
+        virtual void clear() RTT_OVERRIDE
         {
             if(last_sample_p)
                 buffer->Release(last_sample_p);
@@ -122,20 +122,20 @@ namespace RTT { namespace internal {
             base::ChannelElement<T>::clear();
         }
 
-        virtual WriteStatus data_sample(param_t sample, bool reset = true)
+        virtual WriteStatus data_sample(param_t sample, bool reset = true) RTT_OVERRIDE
         {
             if (!buffer->data_sample(sample, reset)) return WriteFailure;
             return base::ChannelElement<T>::data_sample(sample);
         }
 
-        virtual T data_sample()
+        virtual T data_sample() RTT_OVERRIDE
         {
             return buffer->data_sample();
         }
 
         /** Returns a pointer to the ConnPolicy that has been used to construct the underlying buffer.
         */
-        virtual const ConnPolicy* getConnPolicy() const
+        virtual const ConnPolicy* getConnPolicy() const RTT_OVERRIDE
         {
             return &policy;
         }

@@ -43,7 +43,7 @@
 #include "NA.hpp"
 
 #ifdef ORO_SIGNAL_USE_LIST_LOCK_FREE
-#ifndef USE_CPP11
+#ifndef RTT_USE_CPP11
 #include <boost/lambda/bind.hpp>
 #include <boost/bind.hpp>
 #include <boost/lambda/casts.hpp>
@@ -108,7 +108,7 @@ namespace RTT {
     private:
 #ifdef ORO_SIGNAL_USE_LIST_LOCK_FREE
         // required for GCC 4.0.2
-        static connection_impl* applyEmit( connection_t c ) {
+        static connection_impl* applyEmit( const connection_t &c ) {
             return static_cast<connection_impl*> (c.get() );
         }
 #endif
@@ -140,18 +140,19 @@ namespace RTT {
             // this code did initially not work under gcc 4.0/ubuntu breezy.
             // connection_t::get() const becomes an undefined symbol.
             // works under gcc 3.4
-#ifdef USE_CPP11
-            mconnections.apply( bind(&connection_impl::emit,
-                                                    bind( &applyEmit, _1) // works for any compiler
+#ifdef RTT_USE_CPP11
+            mconnections.apply( [&](const connection_t &c) {
+                applyEmit(c)->emit(OROCOS_SIGNATURE_ARGS);
+            } );
 #else
             mconnections.apply( boost::lambda::bind(&connection_impl::emit,
                                                     boost::lambda::bind( &applyEmit, boost::lambda::_1) // works for any compiler
                                                     //not in gcc 4.0.2: boost::lambda::ll_static_cast<connection_impl*>(boost::lambda::bind(&connection_t::get, boost::lambda::_1))
-#endif
 #if OROCOS_SIGNATURE_NUM_ARGS != 0
                                                     ,OROCOS_SIGNATURE_ARGS
 #endif
                                                     ) );
+#endif
             this->emitting = false;
 #else
             os::MutexLock lock(m);

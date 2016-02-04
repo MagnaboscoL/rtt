@@ -37,8 +37,9 @@
 
 
 #include "SignalBase.hpp"
+#ifndef RTT_USE_CPP11
 #include <boost/lambda/bind.hpp>
-
+#endif
 #ifdef ORO_SIGNAL_USE_LIST_LOCK_FREE
 #else
 #include "../os/MutexLock.hpp"
@@ -233,14 +234,18 @@ namespace RTT {
 
 #ifdef ORO_SIGNAL_USE_LIST_LOCK_FREE
         // required for GCC 4.0.2
-        ConnectionBase* getPointer( ConnectionBase::shared_ptr c ) {
+        ConnectionBase* getPointer( const ConnectionBase::shared_ptr &c ) {
             return c.get();
         }
 #endif
 
         void SignalBase::disconnect() {
 #ifdef ORO_SIGNAL_USE_LIST_LOCK_FREE
+#ifdef RTT_USE_CPP11
+            mconnections.apply( [&](const ConnectionBase::shared_ptr &c) { c->disconnect(); } );
+#else
             mconnections.apply( boost::lambda::bind(&ConnectionBase::disconnect, boost::lambda::bind( &getPointer, boost::lambda::_1) ) ); // works for any compiler
+#endif
 #else
             // avoid invalidating iterator
             os::MutexLock lock(m);

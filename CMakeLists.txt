@@ -43,9 +43,9 @@ if (NOT EXISTS ${PROJ_SOURCE_DIR}/orocos-rtt.cmake)
   INCLUDE(${PROJ_SOURCE_DIR}/orocos-rtt.default.cmake)
 endif ()
 
-OPTION(USE_CPP11 "Turn on to replace boost::bind with cpp11 bind." OFF)
+OPTION(RTT_USE_CPP11 "Turn on to replace boost features with C++11 built-ins." OFF)
 if(USE_CPP11)
-  ADD_DEFINITIONS(-DUSE_CPP11)
+  set(RTT_USE_CPP11 ON)
 endif(USE_CPP11)
 
 # On Windows, the default CMAKE_INSTALL_PREFIX is either:

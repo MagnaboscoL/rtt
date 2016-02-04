@@ -35,6 +35,7 @@
 #include <transports/corba/CorbaLib.hpp>
 #include <rtt/internal/DataSourceTypeInfo.hpp>
 
+#include <memory>
 #include <string>
 #include <stdlib.h>
 
@@ -537,7 +538,11 @@ BOOST_AUTO_TEST_CASE( testPortProxying )
     BOOST_CHECK(!write_port->connected());
 
     // Test cloning
-    auto_ptr<base::InputPortInterface> read_clone(dynamic_cast<base::InputPortInterface*>(read_port->clone()));
+#ifdef RTT_USE_CPP11
+    std::unique_ptr<base::InputPortInterface> read_clone(dynamic_cast<base::InputPortInterface*>(read_port->clone()));
+#else
+    std::auto_ptr<base::InputPortInterface> read_clone(dynamic_cast<base::InputPortInterface*>(read_port->clone()));
+#endif
     BOOST_CHECK(mo->createConnection(*read_clone));
     BOOST_CHECK(read_clone->connected());
     BOOST_CHECK(!read_port->connected());

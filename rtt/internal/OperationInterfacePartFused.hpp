@@ -59,7 +59,7 @@
 #include <boost/fusion/include/make_unfused_generic.hpp>
 #endif
 
-#ifndef USE_CPP11
+#ifndef RTT_USE_CPP11
 #include <boost/lambda/lambda.hpp>
 #endif
 
@@ -216,7 +216,7 @@ namespace RTT
                 if ( args.size() != OperationInterfacePartFused<Signature>::arity() ) throw wrong_number_of_args_exception(OperationInterfacePartFused<Signature>::arity(), args.size() );
                 // note: in boost 1.41.0+ the function make_unfused() is available.
 #if BOOST_VERSION >= 104100
-#ifdef USE_CPP11
+#ifdef RTT_USE_CPP11
                 return this->op->signals( boost::fusion::make_unfused(boost::bind(&FusedMSignal<Signature>::invoke,
                                                                                                                     boost::make_shared<FusedMSignal<Signature> >(func, SequenceFactory::assignable(args.begin()), subscriber),
                                                                             _1

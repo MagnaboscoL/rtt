@@ -326,31 +326,31 @@ namespace RTT { namespace base {
          * Returns true, if this channel element has at least one input, independent of whether is has an
          * output connection or not.
          */
-        virtual bool connected();
+        virtual bool connected() RTT_OVERRIDE;
 
         /**
          * Overridden implementation of \ref ChannelElementBase::inputReady().
          * Forwards the inputReady() call to all inputs and only returns true if all inputs returned true.
          */
-        virtual bool inputReady(ChannelElementBase::shared_ptr const& caller);
+        virtual bool inputReady(ChannelElementBase::shared_ptr const& caller) RTT_OVERRIDE;
 
         /**
          * Overridden implementation of \ref ChannelElementBase::clear().
          * Forwards the clear() call to all inputs.
          */
-        virtual void clear();
+        virtual void clear() RTT_OVERRIDE;
 
         using ChannelElementBase::disconnect;
 
         /**
          * Overridden implementation of \ref ChannelElementBase::disconnect(forward, channel).
          */
-        virtual bool disconnect(ChannelElementBase::shared_ptr const& channel, bool forward = true);
+        virtual bool disconnect(ChannelElementBase::shared_ptr const& channel, bool forward = true) RTT_OVERRIDE;
 
         /**
          * Overridden implementation of \ref ChannelElementBase::signalFrom(caller) which remembers the caller who last signalled this channel element.
          */
-        bool signalFrom(ChannelElementBase *caller);
+        bool signalFrom(ChannelElementBase *caller) RTT_OVERRIDE;
 
     protected:
         /**
@@ -358,13 +358,13 @@ namespace RTT { namespace base {
          * @param input the previous element in chain.
          * @return true if the input was set or false if this element does not support multiple inputs and the input is already set.
          */
-        virtual bool addInput(ChannelElementBase::shared_ptr const& input);
+        virtual bool addInput(ChannelElementBase::shared_ptr const& input) RTT_OVERRIDE;
 
         /**
          * Remove an input from the inputs list.
          * @param input the element to be removed
          */
-        virtual void removeInput(ChannelElementBase::shared_ptr const& input);
+        virtual void removeInput(ChannelElementBase::shared_ptr const& input) RTT_OVERRIDE;
     };
 
     /**
@@ -394,26 +394,26 @@ namespace RTT { namespace base {
          * Returns true, if this channel element has at least one output, independent of whether is has an
          * input connection or not.
          */
-        virtual bool connected();
+        virtual bool connected() RTT_OVERRIDE;
 
         /**
          * Overridden implementation of \ref ChannelElementBase::signal() which forwards the signal to all
          * outputs.
          */
-        virtual bool signal();
+        virtual bool signal() RTT_OVERRIDE;
 
         /**
          * Overridden implementation of \ref ChannelElementBase::channelReady() which forwards the signal to all
          * outputs.
          */
-        virtual bool channelReady(ChannelElementBase::shared_ptr const& caller, ConnPolicy const& policy, internal::ConnID *conn_id = 0);
+        virtual bool channelReady(ChannelElementBase::shared_ptr const& caller, ConnPolicy const& policy, internal::ConnID *conn_id = 0) RTT_OVERRIDE;
 
         using ChannelElementBase::disconnect;
 
         /**
          * Overridden implementation of \ref ChannelElementBase::disconnect(forward, channel).
          */
-        virtual bool disconnect(ChannelElementBase::shared_ptr const& channel, bool forward = false);
+        virtual bool disconnect(ChannelElementBase::shared_ptr const& channel, bool forward = false) RTT_OVERRIDE;
 
     protected:
         /**
@@ -422,13 +422,13 @@ namespace RTT { namespace base {
          * @param mandatory whether the added output is mandatory for a write to succeed
          * @return true if the output was set or false if this element does not support multiple outputs and the output is already set.
          */
-        virtual bool addOutput(ChannelElementBase::shared_ptr const& output, bool mandatory = true);
+        virtual bool addOutput(ChannelElementBase::shared_ptr const& output, bool mandatory = true) RTT_OVERRIDE;
 
         /**
          * Remove an output from the outputs list.
          * @param output the element to be removed
          */
-        virtual void removeOutput(ChannelElementBase::shared_ptr const& output);
+        virtual void removeOutput(ChannelElementBase::shared_ptr const& output) RTT_OVERRIDE;
 
         /**
          * Iterate over all output channels and remove the ones that have been marked as disconnected
@@ -448,14 +448,14 @@ namespace RTT { namespace base {
         /**
          * Returns true, if this channel element has at least one input AND at least one output.
          */
-        virtual bool connected();
+        virtual bool connected() RTT_OVERRIDE;
 
         using ChannelElementBase::disconnect;
 
         /**
          * Overridden implementation of \ref ChannelElementBase::disconnect(forward, channel).
          */
-        virtual bool disconnect(ChannelElementBase::shared_ptr const& channel, bool forward);
+        virtual bool disconnect(ChannelElementBase::shared_ptr const& channel, bool forward) RTT_OVERRIDE;
     };
 
     void RTT_API intrusive_ptr_add_ref( ChannelElementBase* e );

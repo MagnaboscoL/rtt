@@ -47,8 +47,8 @@
 #include "../os/MutexLock.hpp"
 
 #include <boost/bind.hpp>
-#ifndef USE_CPP11
-#include <boost/lambda/lambda.hpp>
+#ifndef RTT_USE_CPP11
+    #include <boost/lambda/lambda.hpp>
 #endif
 
 namespace RTT { namespace base {
@@ -146,7 +146,7 @@ namespace RTT { namespace base {
         /**
          * Overridden implementation of MultipleInputsChannelElementBase::data_sample() that gets a sample from the currently selected input.
          */
-        virtual value_t data_sample()
+        virtual value_t data_sample() RTT_OVERRIDE
         {
             RTT::os::SharedMutexLock lock(inputs_lock);
             typename ChannelElement<T>::shared_ptr input = currentInput();
@@ -161,19 +161,19 @@ namespace RTT { namespace base {
          * if a sample was available, and false otherwise. If false is returned,
          * then \a sample is not modified by the method
          */
-        virtual FlowStatus read(reference_t sample, bool copy_old_data = true)
+        virtual FlowStatus read(reference_t sample, bool copy_old_data = true) RTT_OVERRIDE
         {
             FlowStatus result = NoData;
             // read and iterate if necessary.
-#ifdef USE_CPP11
-            select_reader_channel( bind( &MultipleInputsChannelElement<T>::do_read, this, boost::ref(sample), boost::ref(result), _1, _2), copy_old_data );
+#ifdef RTT_USE_CPP11
+            select_reader_channel( [&](bool copy_old_data, typename ChannelElement<T>::shared_ptr& input){ return this->do_read(sample, result, copy_old_data, input); }, copy_old_data );
 #else
             select_reader_channel( boost::bind( &MultipleInputsChannelElement<T>::do_read, this, boost::ref(sample), boost::ref(result), boost::lambda::_1, boost::lambda::_2), copy_old_data );
 #endif
             return result;
         }
 
-        typename ChannelElement<T>::shared_ptr currentInput() {
+        virtual typename ChannelElement<T>::shared_ptr currentInput() {
             typename ChannelElement<T>::shared_ptr last;
             BufferPolicy buffer_policy = getBufferPolicy();
             if (!buffer_policy) buffer_policy = ConnPolicy::Default().buffer_policy;
@@ -259,7 +259,7 @@ namespace RTT { namespace base {
         }
 
     protected:
-        virtual void removeInput(ChannelElementBase::shared_ptr const& input)
+        virtual void removeInput(ChannelElementBase::shared_ptr const& input) RTT_FINAL
         {
             MultipleInputsChannelElementBase::removeInput(input);
             if (last_read == input) last_read = 0;
@@ -280,7 +280,7 @@ namespace RTT { namespace base {
         using typename ChannelElement<T>::param_t;
         using typename ChannelElement<T>::reference_t;
 
-        virtual WriteStatus data_sample(param_t sample, bool reset = true)
+        virtual WriteStatus data_sample(param_t sample, bool reset = true) RTT_OVERRIDE
         {
             WriteStatus result = WriteSuccess;
             bool at_least_one_output_is_disconnected = false;
@@ -321,7 +321,7 @@ namespace RTT { namespace base {
          *
          * @returns false if an error occured that requires the channel to be invalidated. In no ways it indicates that the sample has been received by the other side of the channel.
          */
-        virtual WriteStatus write(param_t sample)
+        virtual WriteStatus write(param_t sample) RTT_OVERRIDE
         {
             WriteStatus result = WriteSuccess;
             bool at_least_one_output_is_disconnected = false;

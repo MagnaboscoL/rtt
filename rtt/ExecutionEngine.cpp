@@ -49,9 +49,9 @@
 
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
-#ifndef USE_CPP11
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
+#ifndef RTT_USE_CPP11
+    #include <boost/lambda/lambda.hpp>
+    #include <boost/lambda/bind.hpp>
 #endif
 #include <functional>
 #include <algorithm>
@@ -166,10 +166,10 @@ namespace RTT
             // Running: create message on stack.
             RemoveMsg rmsg(f,this);
             if ( this->process(&rmsg) )
-#ifdef USE_CPP11
-                this->waitForMessages( ! bind(&ExecutableInterface::isLoaded, f) || bind(&RemoveMsg::found,boost::ref(rmsg)) );
+#ifdef RTT_USE_CPP11
+                this->waitForMessages( [&]{ return (!f->isLoaded() || rmsg.found); } );
 #else
-                this->waitForMessages( ! lambda::bind(&ExecutableInterface::isLoaded, f) || lambda::bind(&RemoveMsg::found,boost::ref(rmsg)) );
+                this->waitForMessages( ! boost::lambda::bind(&ExecutableInterface::isLoaded, f) || boost::lambda::bind(&RemoveMsg::found, boost::ref(rmsg)) );
 #endif
             if (!rmsg.found)
                 return false;

@@ -86,7 +86,7 @@ namespace RTT
                 cleanupStream();
             }
 
-            virtual bool inputReady(base::ChannelElementBase::shared_ptr const& caller) {
+            virtual bool inputReady(base::ChannelElementBase::shared_ptr const& caller) RTT_OVERRIDE {
                 if ( mqReady(read_sample, this) ) {
                     typename base::ChannelElement<T>::shared_ptr output = caller->narrow<T>();
                     assert(output);
@@ -96,7 +96,7 @@ namespace RTT
                 return false;
             }
 
-            virtual WriteStatus data_sample(typename base::ChannelElement<T>::param_t sample, bool reset = true)
+            virtual WriteStatus data_sample(typename base::ChannelElement<T>::param_t sample, bool reset = true) RTT_OVERRIDE
             {
                 // send initial data sample to the other side using a plain write.
                 if (mis_sender && (!write_sample->getRawDataConst() || reset)) {
@@ -125,7 +125,7 @@ namespace RTT
              * file descriptors.
              * @return true in case the forwarding could be done, false otherwise.
              */
-            bool signal()
+            virtual bool signal() RTT_OVERRIDE
             {
                 // copy messages into channel
                 if (mis_sender) {
@@ -149,7 +149,7 @@ namespace RTT
              * @param sample stores the resulting data sample.
              * @return true if an item could be read.
              */
-            FlowStatus read(typename base::ChannelElement<T>::reference_t sample, bool copy_old_data)
+            virtual FlowStatus read(typename base::ChannelElement<T>::reference_t sample, bool copy_old_data) RTT_OVERRIDE
             {
                 throw std::runtime_error("not implemented");
             }
@@ -159,7 +159,7 @@ namespace RTT
              * @param sample the data sample to write
              * @return true if it could be sent.
              */
-            WriteStatus write(typename base::ChannelElement<T>::param_t sample)
+            virtual WriteStatus write(typename base::ChannelElement<T>::param_t sample) RTT_OVERRIDE
             {
                 write_sample->setPointer(&sample);
                 if (!mqWrite(write_sample)) {

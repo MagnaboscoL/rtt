@@ -100,7 +100,7 @@ namespace internal {
         virtual SharedConnID *getConnID();
         virtual const std::string &getName() const;
 
-        virtual const ConnPolicy *getConnPolicy() const;
+        virtual const ConnPolicy *getConnPolicy() const RTT_OVERRIDE;
     };
 
     /**
@@ -159,7 +159,7 @@ namespace internal {
          *
          * @returns false if an error occured that requires the channel to be invalidated. In no ways it indicates that the sample has been received by the other side of the channel.
          */
-        virtual WriteStatus write(param_t sample)
+        virtual WriteStatus write(param_t sample) RTT_OVERRIDE
         {
             WriteStatus result = mstorage->write(sample);
             if (result == WriteSuccess) {
@@ -175,7 +175,7 @@ namespace internal {
          *
          * @return false if no sample has ever been written, true otherwise
          */
-        virtual FlowStatus read(reference_t sample, bool copy_old_data = true)
+        virtual FlowStatus read(reference_t sample, bool copy_old_data = true) RTT_OVERRIDE
         {
             return mstorage->read(sample, copy_old_data);
         }
@@ -184,7 +184,7 @@ namespace internal {
          * Resets the stored sample. After clear() has been called, read()
          * returns false
          */
-        virtual void clear()
+        virtual void clear() RTT_OVERRIDE
         {
             mstorage->clear();
             SharedConnectionBase::clear();
@@ -198,7 +198,7 @@ namespace internal {
          *
          * @returns false if an error occured that requires the channel to be invalidated.
          */
-        virtual WriteStatus data_sample(param_t sample, bool reset = true)
+        virtual WriteStatus data_sample(param_t sample, bool reset = true) RTT_OVERRIDE
         {
             if (!mstorage_initialized) {
                 mstorage->data_sample(sample, reset);
@@ -207,7 +207,7 @@ namespace internal {
             return base::MultipleInputsMultipleOutputsChannelElement<T>::data_sample(sample, reset);
         }
 
-        virtual value_t data_sample()
+        virtual value_t data_sample() RTT_OVERRIDE
         {
             return mstorage->data_sample();
         }

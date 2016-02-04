@@ -126,7 +126,7 @@ namespace RTT {
                   ))
             { base::ChannelElement<T>::signal(); }
 
-            bool signal()
+            bool signal() RTT_OVERRIDE
             {
                 // forward too.
                 base::ChannelElementBase::signal();
@@ -181,7 +181,7 @@ namespace RTT {
 
             }
 
-            void disconnect() {
+            virtual void disconnect() RTT_OVERRIDE {
                 // disconnect both local and remote side.
                 // !!!THIS RELIES ON BEHAVIOR OF REMOTEDISCONNECT BELOW doing both forward and !forward !!!
                 try {
@@ -216,7 +216,7 @@ namespace RTT {
                 catch(CORBA::Exception&) {}
             }
 
-            bool disconnect(const base::ChannelElementBase::shared_ptr& channel, bool forward)
+            bool disconnect(const base::ChannelElementBase::shared_ptr& channel, bool forward) RTT_OVERRIDE
             {
                 bool success = false;
 
@@ -245,7 +245,7 @@ namespace RTT {
                 return success;
             }
 
-            FlowStatus read(typename base::ChannelElement<T>::reference_t sample, bool copy_old_data)
+            FlowStatus read(typename base::ChannelElement<T>::reference_t sample, bool copy_old_data) RTT_OVERRIDE
             {
                 if (!valid)
                     return NoData;
@@ -318,7 +318,7 @@ namespace RTT {
                 return (CFlowStatus)fs;
             }
 
-            WriteStatus write(typename base::ChannelElement<T>::param_t sample)
+            virtual WriteStatus write(typename base::ChannelElement<T>::param_t sample) RTT_OVERRIDE
             {
                 WriteStatus result;
 
@@ -417,7 +417,7 @@ namespace RTT {
             /**
              * CORBA IDL function.
              */
-            virtual bool inputReady()
+            virtual bool inputReady() RTT_OVERRIDE
             {
                 // signal to oob transport if any.
                 typename base::ChannelElement<T>::shared_ptr input =
@@ -427,7 +427,7 @@ namespace RTT {
                 return true;
             }
 
-            virtual bool channelReady(base::ChannelElementBase::shared_ptr const& caller, ConnPolicy const& policy, internal::ConnID *conn_id)
+            virtual bool channelReady(base::ChannelElementBase::shared_ptr const& caller, ConnPolicy const& policy, internal::ConnID *conn_id) RTT_OVERRIDE
             {
                 // try to forward locally first
                 if (base::ChannelElement<T>::channelReady(caller, policy, conn_id))

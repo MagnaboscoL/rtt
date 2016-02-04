@@ -62,7 +62,7 @@ namespace RTT { namespace internal {
 
         /** Update the data sample stored in this element.
          * It always returns true. */
-        virtual WriteStatus write(param_t sample)
+        virtual WriteStatus write(param_t sample) RTT_OVERRIDE
         {
             if (!data->Set(sample)) return WriteFailure;
             return this->signal() ? WriteSuccess : NotConnected;
@@ -72,7 +72,7 @@ namespace RTT { namespace internal {
          *
          * @return false if no sample has ever been written, true otherwise
          */
-        virtual FlowStatus read(reference_t sample, bool copy_old_data)
+        virtual FlowStatus read(reference_t sample, bool copy_old_data) RTT_OVERRIDE
         {
             return data->Get(sample, copy_old_data);
         }
@@ -80,26 +80,26 @@ namespace RTT { namespace internal {
         /** Resets the stored sample. After clear() has been called, read()
          * returns false
          */
-        virtual void clear()
+        virtual void clear() RTT_OVERRIDE
         {
             data->clear();
             base::ChannelElement<T>::clear();
         }
 
-        virtual WriteStatus data_sample(param_t sample, bool reset = true)
+        virtual WriteStatus data_sample(param_t sample, bool reset = true) RTT_OVERRIDE
         {
             if (!data->data_sample(sample, reset)) return WriteFailure;
             return base::ChannelElement<T>::data_sample(sample);
         }
 
-        virtual T data_sample()
+        virtual T data_sample() RTT_OVERRIDE
         {
             return data->Get();
         }
 
         /** Returns a pointer to the ConnPolicy that has been used to construct the underlying data object.
         */
-        virtual const ConnPolicy* getConnPolicy() const
+        virtual const ConnPolicy* getConnPolicy() const RTT_OVERRIDE
         {
             return &policy;
         }

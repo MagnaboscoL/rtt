@@ -102,4 +102,27 @@
 #define RTT_DEPRECATED
 #endif
 
+//
+// Enable C+11 features and
+// conditionally define macros for the C++11 override and final keywords
+//
+#ifndef RTT_USE_CPP11
+#cmakedefine RTT_USE_CPP11
+// For backwards compatibility we also accept USE_CPP11:
+#  if !defined(RTT_USE_CPP11) && defined(USE_CPP11)
+#    define RTT_USE_CPP11
+#  endif
+#endif
+#if __cplusplus >= 201103L
+#  define RTT_OVERRIDE override
+#  define RTT_FINAL final
+#else
+#  define RTT_OVERRIDE
+#  define RTT_FINAL
+#  ifdef RTT_USE_CPP11
+#    pragma message("WARNING: RTT was compiled with C++11 support enabled, but C++11 is not supported by this compiler.")
+#    undef RTT_USE_CPP11
+#  endif
+#endif
+
 #endif
