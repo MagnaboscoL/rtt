@@ -78,13 +78,8 @@ void RemotePort<BaseClass>::disconnect()
 {
     dataflow->disconnectPort(this->getName().c_str());
 }
-template<typename BaseClass>
-bool RemotePort<BaseClass>::disconnect(PortInterface* port)
-{
-    Logger::In in("RemotePort::disconnect(PortInterface& port)");
-    log(Error) << "Disconnecting a single port not yet supported." <<endlog();
-    return false;
-}
+
+
 template<typename BaseClass>
 PortableServer::POA_ptr RemotePort<BaseClass>::_default_POA()
 { return PortableServer::POA::_duplicate(mpoa); }
@@ -194,6 +189,19 @@ RTT::base::ChannelElementBase::shared_ptr RemoteInputPort::buildRemoteChannelOut
     return corba_ceb;
 }
 
+bool RemoteInputPort::disconnect(PortInterface* port)
+{
+    //just check the type and not relay on
+    RemoteOutputPort *oPort = dynamic_cast<RemoteOutputPort* >(port);
+    if(oPort == NULL){
+        log(Error) << "Port: " << this->getName() << " could not be disconnected from: " << oPort->getName()
+                << " because it is not of type: RemoteOutputPort" << endlog();
+        return false;
+    }
+
+    return dataflow->removeConnection(oPort->getName().c_str(), this->getDataFlowInterface(), this->getName().c_str());
+}
+
 RTT::base::PortInterface* RemoteInputPort::clone() const
 { return type_info->inputPort(getName()); }
 
@@ -235,6 +243,20 @@ void RemoteOutputPort::keepLastWrittenValue(bool new_flag)
 DataSourceBase::shared_ptr RemoteOutputPort::getDataSource() const
 {
     return DataSourceBase::shared_ptr();
+}
+
+
+bool RemoteOutputPort::disconnect(PortInterface* port)
+{
+    RemoteInputPort *portI = dynamic_cast<RemoteInputPort *>(port);
+
+    if(portI == NULL){
+        log(Error) << "Port: " << port->getName() << " could not be disconnected from: " << this->getName()
+                << "because it could not be casted to type: RemoteInputPort" << endlog();
+        return false;
+    }
+
+    return dataflow->removeConnection(this->getName().c_str(), portI->getDataFlowInterface(), portI->getName().c_str());
 }
 
 bool RemoteOutputPort::createConnection( RTT::base::InputPortInterface& sink, RTT::ConnPolicy const& policy )
