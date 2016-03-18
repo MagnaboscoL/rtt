@@ -194,6 +194,7 @@ bool RemoteInputPort::disconnect(PortInterface* port)
     //just check the type and not relay on
     RemoteOutputPort *oPort = dynamic_cast<RemoteOutputPort* >(port);
     if(oPort == NULL){
+        Logger::In in("RemoteInputPort::disconnect(PortInterface& port)");
         log(Error) << "Port: " << this->getName() << " could not be disconnected from: " << oPort->getName()
                 << " because it is not of type: RemoteOutputPort" << endlog();
         return false;
@@ -251,6 +252,7 @@ bool RemoteOutputPort::disconnect(PortInterface* port)
     RemoteInputPort *portI = dynamic_cast<RemoteInputPort *>(port);
 
     if(portI == NULL){
+        Logger::In in("RemoteOutputPort::disconnect(PortInterface& port)");
         log(Error) << "Port: " << port->getName() << " could not be disconnected from: " << this->getName()
                 << "because it could not be casted to type: RemoteInputPort" << endlog();
         return false;
