@@ -47,7 +47,6 @@
 #include "../../internal/ConnID.hpp"
 #include "../../rtt-detail-fwd.hpp"
 
-
 using namespace std;
 using namespace RTT::detail;
 
@@ -191,16 +190,7 @@ RTT::base::ChannelElementBase::shared_ptr RemoteInputPort::buildRemoteChannelOut
 
 bool RemoteInputPort::disconnect(PortInterface* port)
 {
-    //just check the type and not relay on
-    RemoteOutputPort *oPort = dynamic_cast<RemoteOutputPort* >(port);
-    if(oPort == NULL){
-        Logger::In in("RemoteInputPort::disconnect(PortInterface& port)");
-        log(Error) << "Port: " << this->getName() << " could not be disconnected from: " << oPort->getName()
-                << " because it is not of type: RemoteOutputPort" << endlog();
-        return false;
-    }
-
-    return dataflow->removeConnection(oPort->getName().c_str(), this->getDataFlowInterface(), this->getName().c_str());
+    return port->disconnect(this);
 }
 
 RTT::base::PortInterface* RemoteInputPort::clone() const
@@ -252,12 +242,23 @@ bool RemoteOutputPort::disconnect(PortInterface* port)
     RemoteInputPort *portI = dynamic_cast<RemoteInputPort *>(port);
 
     if(portI == NULL){
-        Logger::In in("RemoteOutputPort::disconnect(PortInterface& port)");
-        log(Error) << "Port: " << port->getName() << " could not be disconnected from: " << this->getName()
-                << "because it could not be casted to type: RemoteInputPort" << endlog();
-        return false;
-    }
+        //in this case should be an InputPort at least.
+        RTT::base::InputPortInterface *portIn = dynamic_cast<RTT::base::InputPortInterface *>(port);
+        //if still NULL give up:
+        if(portIn == NULL){
+            Logger::In in("RemoteOutputPort::disconnect(PortInterface& port)");
+            log(Error) << "Port: " << port->getName() << " could not be disconnected from: " << this->getName()
+                    << "because it could not be casted to an InputPort type!" << endlog();
+            return false;
+        }
 
+        if(portIn->disconnect(this) or cmanager.disconnect(portIn)){
+            return true;
+        }
+        return false;
+
+    }
+    //if Remote Input Port:
     return dataflow->removeConnection(this->getName().c_str(), portI->getDataFlowInterface(), portI->getName().c_str());
 }
 
