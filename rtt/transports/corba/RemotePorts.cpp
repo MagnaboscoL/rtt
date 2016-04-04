@@ -190,6 +190,15 @@ RTT::base::ChannelElementBase::shared_ptr RemoteInputPort::buildRemoteChannelOut
 
 bool RemoteInputPort::disconnect(PortInterface* port)
 {
+    //only try if other port is remote too:
+    RemoteOutputPort *oPort = dynamic_cast<RemoteOutputPort *>(port);
+    if(oPort == NULL){
+        Logger::In in("RemoteInputPort::disconnect(PortInterface *port)");
+        log(Error) << "Port: " << port->getName() << " could not be disconnected from: " << this->getName()
+                   << "because it could not be casted to an RemoteOutputPort type!" << std::endl
+                   << "Only disconnect of two remote ports supported by corba layer, yet!" << std::endl << endlog();
+        return false;
+    }
     return port->disconnect(this);
 }
 
@@ -241,25 +250,18 @@ bool RemoteOutputPort::disconnect(PortInterface* port)
 {
     RemoteInputPort *portI = dynamic_cast<RemoteInputPort *>(port);
 
+    //if not a remote port, we can not handle at the moment!
     if(portI == NULL){
-        //in this case should be an InputPort at least.
-        RTT::base::InputPortInterface *portIn = dynamic_cast<RTT::base::InputPortInterface *>(port);
-        //if still NULL give up:
-        if(portIn == NULL){
-            Logger::In in("RemoteOutputPort::disconnect(PortInterface& port)");
-            log(Error) << "Port: " << port->getName() << " could not be disconnected from: " << this->getName()
-                    << "because it could not be casted to an InputPort type!" << endlog();
-            return false;
-        }
-
-        if(portIn->disconnect(this) or cmanager.disconnect(portIn)){
-            return true;
-        }
+        Logger::In in("RemoteOutputPort::disconnect(PortInterface& port)");
+        log(Error) << "Port: " << port->getName() << " could not be disconnected from: " << this->getName()
+                   << "because it could not be casted to an RemoteInputPort type!" << std::endl
+                   << "Only disconnect of two remote ports supported by corba layer, yet!" << std::endl << endlog();
         return false;
-
     }
+
     //if Remote Input Port:
-    return dataflow->removeConnection(this->getName().c_str(), portI->getDataFlowInterface(), portI->getName().c_str());
+    return dataflow->removeConnection(this->getName().c_str(), portI->getDataFlowInterface(),
+                                      portI->getName().c_str());
 }
 
 bool RemoteOutputPort::createConnection( RTT::base::InputPortInterface& sink, RTT::ConnPolicy const& policy )
