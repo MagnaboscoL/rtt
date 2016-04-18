@@ -605,6 +605,11 @@ BOOST_AUTO_TEST_CASE( testRemotePortDisconnect )
     ts2  = corba::TaskContextServer::Create( t2, false ); //no-naming
     tp2  = corba::TaskContextProxy::Create( ts2->server(), true );
 
+    // Create a default CORBA policy specification
+    RTT::ConnPolicy policy = ConnPolicy::data();
+    policy.init = false;
+    policy.transport = ORO_CORBA_PROTOCOL_ID; // force creation of non-local connections
+
     base::PortInterface* untyped_port;
 
     //mi1
@@ -639,12 +644,12 @@ BOOST_AUTO_TEST_CASE( testRemotePortDisconnect )
     BOOST_CHECK(dynamic_cast<corba::RemoteOutputPort*>(write_port2));
 
     //create remote connections:
-    write_port2->createConnection(*read_port1);
+    write_port2->connectTo(read_port1, policy);
     BOOST_CHECK(read_port1->connected());
     BOOST_CHECK(write_port2->connected());
 
     //second connection to this input port
-    write_port1->createConnection(*read_port1);
+    write_port1->connectTo(read_port1, policy);
     BOOST_CHECK(write_port1->connected());
 
     //disconnect single port connection (both remote), same tcs object.
@@ -657,7 +662,7 @@ BOOST_AUTO_TEST_CASE( testRemotePortDisconnect )
     BOOST_CHECK(!read_port1->connected());
 
     //check disconnecting call on reader port. (build connection again beforehand).
-    write_port2->createConnection(*read_port1);
+    write_port2->connectTo(read_port1, policy);
     BOOST_CHECK(read_port1->connected());
     BOOST_CHECK(write_port2->connected());
     BOOST_CHECK(read_port1->disconnect(write_port2));
@@ -666,7 +671,7 @@ BOOST_AUTO_TEST_CASE( testRemotePortDisconnect )
 
     //check connect and disconnect certain port, remote output to local input
     //should give falls cause not supported yet!
-    write_port2->connectTo(mi1);
+    write_port2->connectTo(mi1, policy);
     BOOST_CHECK(mi1->connected());
     BOOST_CHECK(write_port2->connected());
     BOOST_CHECK(!write_port2->disconnect(mi1));
@@ -674,7 +679,7 @@ BOOST_AUTO_TEST_CASE( testRemotePortDisconnect )
 
     //check disconnect remote input port from local output port.
     //should give falls cause not supported yet!
-    mo2->connectTo(read_port1);
+    mo2->connectTo(read_port1, policy);
     BOOST_CHECK(read_port1->connected());
     BOOST_CHECK(mo2->connected());
     BOOST_CHECK(!read_port1->disconnect(mo2));
