@@ -121,7 +121,7 @@ namespace RTT
          * @param priority The priority within the \a scheduler of this timer.
          * @param name The name of the timer (ie the underlying Activity/Thread)
          */
-        Timer(TimerId max_timers, int scheduler = -1, int priority = 0, const std::string& name = std::string("Timer"));
+        Timer(TimerId max_timers, int scheduler = -1, int priority = 0, const std::string& name = std::string("RTT::Timer"));
 
         ~Timer();
 
