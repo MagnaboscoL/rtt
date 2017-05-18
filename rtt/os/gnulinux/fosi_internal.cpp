@@ -167,10 +167,10 @@ namespace RTT
             // trim the name to fit 16 bytes restriction (including terminating
             // \0 character) of pthread_setname_np
             static const int MAX_THREAD_NAME_SIZE = 15;
-            const char *thread_name = task->name;
+            char *thread_name = task->name;
             std::size_t thread_name_len = strlen(thread_name);
             if (thread_name_len > MAX_THREAD_NAME_SIZE) {
-                thread_name += thread_name_len - MAX_THREAD_NAME_SIZE;
+                thread_name[MAX_THREAD_NAME_SIZE] = '\0';
             }
             int result = pthread_setname_np(task->thread, thread_name);
             if (result != 0) {
@@ -376,7 +376,7 @@ namespace RTT
                 ret = -1;
             }
             // and limit them according to pam_Limits (only if not root)
-            if ( geteuid() != 0 
+            if ( geteuid() != 0
 #ifdef ORO_OS_LINUX_CAP_NG
                  && !capng_have_capability(CAPNG_EFFECTIVE, CAP_SYS_NICE)
 #endif
