@@ -184,21 +184,7 @@ namespace RTT
         return;
     }
 
-    if ( name.find("GlobalsRepository.") == 0  ) {
-        std::string::size_type pos = name.find("GlobalsRepository.")+strlen("GlobalsRepository.");
-        std::string global_var_name = std::string(name, pos, name.length());
-        GlobalsRepository::shared_ptr globals = GlobalsRepository::Instance();
-
-        if ( globals->hasAttribute( global_var_name ) ) {
-            ret = globals->getValue(global_var_name)->getDataSource();
-            return;
-        }
-
-        if ( globals->hasProperty( global_var_name ) ) {
-            ret = globals->properties()->find(global_var_name)->getDataSource();
-            return;
-        }
-    }
+    throw_(begin, "Value " + name + " not defined in "+ task->getName()+".");
   }
 
     void ValueParser::seennull()
