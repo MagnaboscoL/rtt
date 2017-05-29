@@ -647,6 +647,8 @@ namespace RTT
       std::string member(s,f);
       // inspirired on seen_unary
     DataSourceBase::shared_ptr arg( parsestack.top() );
+    if ( ! arg)
+      throw parse_exception_fatal_semantic_error( "Root element not found\"." );
     parsestack.pop();
     DataSourceBase::shared_ptr ret = arg->getMember(member);
     if ( ! ret )
