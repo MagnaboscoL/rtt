@@ -86,6 +86,8 @@ namespace RTT
             return false;
         if ( ! p->ready() )
             return false;
+        if ( p->getName().find(".") != std::string::npos )
+            return false;
         removeProperty(p);
         mproperties.push_back(p);
         mowned_props.push_back(p);
@@ -107,6 +109,8 @@ namespace RTT
         if (&p == 0)
             return false;
         if ( ! p.ready() )
+            return false;
+        if (p.getName().find(".") != std::string::npos)
             return false;
         mproperties.push_back(&p);
         return true;

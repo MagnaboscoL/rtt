@@ -140,6 +140,9 @@ namespace RTT
                 switch ( tag_stack.top() )
                 {
                     case TAG_SIMPLE:
+                        if ( name.find(".") != std::string::npos )
+                            throw SAXException(std::string("Name not allowed for property '"+name+"'."\
+                                                           " Property name can't contain dots.").c_str());
                         if ( type == "boolean" )
                         {
                             if ( value_string == "1" || value_string == "true")

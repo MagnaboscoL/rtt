@@ -30,7 +30,10 @@ bool RTT::types::composePropertyBag( PropertyBag const& sourcebag, PropertyBag& 
             PropertyBase* tgtprop = ti->buildProperty(isbag.getName(), isbag.getDescription());
             if ( ti->composeType(isbag.getDataSource(), tgtprop->getDataSource()) ) {
                 log(Debug) << "Used user's composition function for " << tgtprop->getName() <<":"<<tgtprop->getType()<<endlog();
-                target.ownProperty(tgtprop);
+                if ( !target.ownProperty(tgtprop) ) {
+                    log(Error) <<"Failed to add Property " << tgtprop->getName() << " while composing PropertyBag."<< endlog();
+                    return false;
+                }
             } else {
                 log(Error) <<"The type '" << isbag.value().getType() <<"' did not provide a type composition function, but I need one to compose it from a PropertyBag." <<endlog();
                 delete tgtprop;
@@ -46,10 +49,16 @@ bool RTT::types::composePropertyBag( PropertyBag const& sourcebag, PropertyBag& 
                     has_error = true;
                     continue;
                 }
-                target.ownProperty( newbag );
+                if ( !target.ownProperty(newbag) ) {
+                    log(Error) <<"Failed to add Property " << newbag->getName() << " while composing PropertyBag."<< endlog();
+                    return false;
+                }
             } else {
                 // plain property, not a bag:
-                target.ownProperty( (*sit)->clone() );
+                if ( !target.ownProperty( (*sit)->clone() ) ) {
+                    log(Error) <<"Failed to add Property " << ((*sit)->clone())->getName() << " while composing PropertyBag."<< endlog();
+                    return false;
+                }
             }
         }
     }

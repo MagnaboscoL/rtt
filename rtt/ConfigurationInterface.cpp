@@ -90,6 +90,8 @@ namespace RTT {
     bool ConfigurationInterface::addProperty( PropertyBase& pb ) {
         if ( bag.find( pb.getName() ) )
             return false;
+        if (pb.getName().find(".") != std::string::npos)
+            return false;
         bag.add( &pb );
         return true;
     }
